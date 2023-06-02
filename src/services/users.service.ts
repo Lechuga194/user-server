@@ -24,7 +24,7 @@ export async function getUser(id: string) {
     .select()
     .from(tables.users)
     .where({ id })
-    .then((data) => data)
+    .then((data) => data[0])
     .catch((err) => {
       throw err;
     });
