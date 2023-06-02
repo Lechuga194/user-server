@@ -1,6 +1,12 @@
 import db from '../configs/db.config';
 import tables from '../constants/tables.constants';
 import User from '../types/user.type';
+import hashString from '../utils/hash.util';
+import {
+  validateEmail,
+  validateNames,
+  validatePassword
+} from '../utils/validation.util';
 
 //TODO ALLOW ACCESS ONLY IF LOGGED
 export async function getAllUsers() {
@@ -24,8 +30,18 @@ export async function getUser(id: string) {
     });
 }
 
-//TODO ADD EMAIL VERIFICATION AND PASSWORD HASH
 export async function saveUser(user: User) {
+  const isNamesValid = validateNames(user.name, user.surname, user.username);
+  const isEmailValid = validateEmail(user.email);
+  const isPasswordValid = validatePassword(user.password);
+
+  if (!isNamesValid || !isEmailValid || !isPasswordValid) {
+    throw new Error('Invalid data');
+  }
+
+  //We hash the user original password
+  user.password = hashString(user.password);
+
   return db
     .transaction(async (trx) => {
       return await trx(tables.users)
@@ -56,9 +72,15 @@ export async function removeUser(id: string) {
     });
 }
 
-//TODO ADD EMAIL VERIFICATION
 export async function updateUser(user: User) {
   const id = user.id;
+  const isNamesValid = validateNames(user.name, user.surname, user.username);
+  const isEmailValid = validateEmail(user.email);
+
+  if (!isNamesValid || !isEmailValid) {
+    throw new Error('Invalid data');
+  }
+
   return db
     .transaction(async (trx) => {
       return await trx(tables.users)
