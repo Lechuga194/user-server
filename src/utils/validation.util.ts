@@ -1,5 +1,5 @@
 import emailValidator from 'email-validator';
-import passwordValidator from 'password-validator';
+import PasswordValidator from 'password-validator';
 
 /**
  * This function verifies if the password has no empty spaces and if is at least of 8 chars and a max of 100 chars long
@@ -9,7 +9,7 @@ import passwordValidator from 'password-validator';
  */
 export const validatePassword = (password: string | undefined): boolean => {
   if (!password) return false;
-  const passwordSchema = new passwordValidator();
+  const passwordSchema = new PasswordValidator();
   passwordSchema.is().min(8).is().max(100).has().not().spaces();
   return passwordSchema.validate(password) as boolean;
 };
