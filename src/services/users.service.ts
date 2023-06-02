@@ -96,7 +96,7 @@ export async function updateUser(user: User) {
     });
 }
 
-export async function signing(email: string, password: string) {
+export async function login(email: string, password: string) {
   const isEmailValid = validateEmail(email);
 
   if (!isEmailValid) {
@@ -133,5 +133,5 @@ export default {
   saveUser,
   removeUser,
   updateUser,
-  signing
+  login
 };
