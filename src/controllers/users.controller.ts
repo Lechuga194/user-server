@@ -65,10 +65,21 @@ export async function updateUser(req: Request, res: Response) {
   }
 }
 
+export async function signing(req: Request, res: Response) {
+  try {
+    const { email, password } = req.body;
+    res.json(await usersService.signing(email, password));
+  } catch (err) {
+    console.error(`Error while signing`, err);
+    res.status(400).send('A problem occurred while signing');
+  }
+}
+
 export default {
   getAllUsers,
   getUser,
   saveUser,
   removeUser,
-  updateUser
+  updateUser,
+  signing
 };

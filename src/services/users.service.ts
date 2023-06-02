@@ -1,7 +1,7 @@
 import db from '../configs/db.config';
 import tables from '../constants/tables.constants';
 import User from '../types/user.type';
-import hashString from '../utils/hash.util';
+import { hashString, compareHash } from '../utils/hash.util';
 import {
   validateEmail,
   validateNames,
@@ -96,10 +96,42 @@ export async function updateUser(user: User) {
     });
 }
 
+export async function signing(email: string, password: string) {
+  const isEmailValid = validateEmail(email);
+
+  if (!isEmailValid) {
+    throw new Error('Invalid email');
+  }
+
+  return db
+    .transaction((trx) => {
+      return trx
+        .select('*')
+        .from(tables.users)
+        .where({ email })
+        .then((user) => {
+          const hash = user[0].password;
+          const areCredentialsValid = compareHash(password, hash);
+          if (areCredentialsValid) {
+            return user[0];
+          } else {
+            throw new Error('Invalid credentials');
+          }
+        })
+        .then(trx.commit)
+        .catch(trx.rollback);
+    })
+    .then((res) => res)
+    .catch((err) => {
+      throw err;
+    });
+}
+
 export default {
   getAllUsers,
   getUser,
   saveUser,
   removeUser,
-  updateUser
+  updateUser,
+  signing
 };
